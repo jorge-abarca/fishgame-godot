@@ -22,7 +22,7 @@ using Godot;
 namespace Nakama {
 
     /// <summary>
-    /// An Http adapter which uses Godot's HttpRequest node.
+    /// An HTTP adapter which uses Godot's HTTPRequest node.
     /// </summary>
     /// <remarks>
     /// Note Content-Type header is always set as 'application/json'.
@@ -39,25 +39,25 @@ namespace Nakama {
         public async Task<string> SendAsync(string method, Uri uri, IDictionary<string, string> headers,
             byte[] body, int timeout, CancellationToken? cancellationToken)
         {
-            var req = new HttpRequest();
+            var req = new HTTPRequest();
             req.Timeout = timeout;
 
             if (OS.GetName() != "HTML5") {
                 req.UseThreads = true;
             }
 
-            var godot_method = HttpClient.Method.Get;
+            var godot_method = HTTPClient.Method.Get;
             if (method == "POST") {
-                godot_method = HttpClient.Method.Post;
+                godot_method = HTTPClient.Method.Post;
             }
             else if (method == "PUT") {
-                godot_method = HttpClient.Method.Put;
+                godot_method = HTTPClient.Method.Put;
             }
             else if (method == "DELETE") {
-                godot_method = HttpClient.Method.Delete;
+                godot_method = HTTPClient.Method.Delete;
             }
             else if (method == "HEAD") {
-                godot_method = HttpClient.Method.Head;
+                godot_method = HTTPClient.Method.Head;
             }
 
             var headers_array = new String[headers.Count + 1];
@@ -71,13 +71,13 @@ namespace Nakama {
             string body_string = body != null ? System.Text.Encoding.UTF8.GetString(body) : "";
 
             AddChild(req);
-            req.Request(uri.ToString(), headers_array, godot_method, body_string);
+            req.Request(uri.ToString(), headers_array, true, godot_method, body_string);
 
             Logger?.InfoFormat("Send: method='{0}', uri='{1}', body='{2}'", method, uri, body_string);
 
             Variant[] resultObjects = await ToSignal(req, "request_completed");
 
-            HttpRequest.Result result = (HttpRequest.Result)(long)resultObjects[0];
+            HTTPRequest.Result result = (HTTPRequest.Result)(long)resultObjects[0];
             long response_code = (long)resultObjects[1];
             string response_body = System.Text.Encoding.UTF8.GetString((byte[])resultObjects[3]);
 
@@ -85,7 +85,7 @@ namespace Nakama {
 
             Logger?.InfoFormat("Received: status={0}, contents='{1}'", response_code, response_body);
 
-            if (result == HttpRequest.Result.Success && response_code >= 200 && response_code <= 299) {
+            if (result == HTTPRequest.Result.Success && response_code >= 200 && response_code <= 299) {
                 return response_body;
             }
 

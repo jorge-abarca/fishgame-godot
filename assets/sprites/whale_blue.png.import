@@ -2,7 +2,7 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://cnpa1m76bw0ew"
+uid="uid://b5c1c1xjnvmpm"
 path="res://.godot/imported/whale_blue.png-7cfa8b6ba0d3b927caf0b7cc3447aca8.ctex"
 metadata={
 "vram_texture": false
@@ -31,4 +31,4 @@ process/normal_map_invert_y=false
 process/hdr_as_srgb=false
 process/hdr_clamp_exposure=false
 process/size_limit=0
-detect_3d/compress_to=1
+detect_3d/compress_to=0

@@ -3,18 +3,15 @@ class_name UILayer
 
 @onready var screens = $Screens
 @onready var message_label = $Overlay/Message
-@onready var backbutton = $Overlay/BackButton
+@onready var back_button = $Overlay/BackButton
 
 signal change_screen (name, screen)
-signal back_button ()
+signal s_back_button ()
 
-var current_screen: Control = null: set = _set_readonly_variable
-var current_screen_name: String = '': get = get_current_screen_name, set = _set_readonly_variable
+var current_screen: Control = null
+var current_screen_name: String = '': get = get_current_screen_name
 
 var _is_ready := false
-
-func _set_readonly_variable(_value) -> void:
-	pass
 
 func _ready() -> void:
 	for screen in screens.get_children():
@@ -59,10 +56,10 @@ func hide_message() -> void:
 	message_label.visible = false
 
 func show_back_button() -> void:
-	backbutton.visible = true
+	back_button.visible = true
 
 func hide_back_button() -> void:
-	backbutton.visible = false
+	back_button.visible = false
 
 func hide_all() -> void:
 	hide_screen()
@@ -70,7 +67,7 @@ func hide_all() -> void:
 	hide_back_button()
 
 func _on_BackButton_pressed() -> void:
-	emit_signal("back_button")
+	emit_signal("s_back_button")
 
 func _on_MuteButton_toggled(button_pressed: bool) -> void:
 	AudioServer.set_bus_mute(0, button_pressed)

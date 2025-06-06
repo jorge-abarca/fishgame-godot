@@ -1,8 +1,8 @@
 extends StaticBody2D
 
 @export var pickup_scene: PackedScene
-@export var pickup_parent: Node2D = get_parent()
-@export var regenerate_delay: float = 10.0
+@export var pickup_parent_path: NodePath = ^".."
+@export var regenerate_delay := 10.0
 
 @onready var timer = $Timer
 @onready var animation_player = $AnimationPlayer
@@ -15,6 +15,7 @@ func _ready() -> void:
 	timer.connect("timeout", Callable(self, "_do_generate"))
 
 func _do_generate() -> void:
+	var pickup_parent = get_node(pickup_parent_path)
 	if not pickup_parent:
 		return
 
@@ -28,6 +29,7 @@ func _do_generate() -> void:
 	if not pickup_scene:
 		return
 
+	var pickup_parent = get_node(pickup_parent_path)
 	if not pickup_parent:
 		return
 

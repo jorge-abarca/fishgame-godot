@@ -2,21 +2,21 @@ extends Node2D
 
 var Player = preload("res://actors/Player.tscn")
 
-@export var map_scene: PackedScene = preload("res://maps/Map1.tscn")
+@export var map_scene : PackedScene = preload("res://maps/Map1.tscn")
 
 @onready var map: Node2D = $Map
 @onready var players_node := $Players
 @onready var camera := $Camera2D
 @onready var original_camera_position: Vector2 = camera.global_position
 
-var has_game_started := false
-var is_game_over := false
+var game_started : bool = false
+var game_over : bool = false
 var players_alive := {}
 var players_setup := {}
 
-signal game_started ()
+signal s_game_started ()
 signal player_dead (peer_id)
-signal game_over (peer_id)
+signal s_game_over (peer_id)
 
 func game_start(players: Dictionary) -> void:
 	if GameState.online_play:
@@ -25,14 +25,15 @@ func game_start(players: Dictionary) -> void:
 		_do_game_setup(players)
 
 # Initializes the game so that it is ready to really start.
-@rpc("any_peer", "call_local") func _do_game_setup(players: Dictionary) -> void:
+@rpc("any_peer", "call_local") 
+func _do_game_setup(players: Dictionary) -> void:
 	get_tree().set_pause(true)
 
-	if has_game_started:
+	if game_started:
 		game_stop()
 
-	has_game_started = true
-	is_game_over = false
+	game_started = true
+	game_over = false
 	players_alive = players
 
 	reload_map()
@@ -59,7 +60,8 @@ func game_start(players: Dictionary) -> void:
 	camera.update_position_and_zoom(false)
 
 	if GameState.online_play:
-		var my_id : String = get_tree().get_unique_id()
+#		var my_id := get_tree().get_unique_id()
+		var my_id := OS.get_unique_id()
 		var my_player := players_node.get_node(str(my_id))
 		my_player.player_controlled = true
 
@@ -69,24 +71,26 @@ func game_start(players: Dictionary) -> void:
 		_do_game_start()
 
 # Records when each player has finished setup so we know when all players are ready.
-@rpc("any_peer", "call_local") func _finished_game_setup(peer_id: int) -> void:
+@rpc("any_peer", "call_local") 
+func _finished_game_setup(peer_id: int) -> void:
 	players_setup[peer_id] = players_alive[peer_id]
 	if players_setup.size() == players_alive.size():
 		# Once all clients have finished setup, tell them to start the game.
 		rpc('_do_game_start')
 
 # Actually start the game on this client.
-@rpc("any_peer", "call_local") func _do_game_start() -> void:
+@rpc("any_peer", "call_local") 
+func _do_game_start() -> void:
 	if map.has_method('map_start'):
 		map.map_start()
-	emit_signal("game_started")
+	emit_signal("s_game_started")
 	get_tree().set_pause(false)
 
 func game_stop() -> void:
 	if map.has_method('map_stop'):
 		map.map_stop()
 
-	has_game_started = false
+	game_started = false
 	players_setup.clear()
 	players_alive.clear()
 
@@ -125,7 +129,7 @@ func _on_player_dead(peer_id) -> void:
 	emit_signal("player_dead", peer_id)
 
 	players_alive.erase(peer_id)
-	if not is_game_over and players_alive.size() == 1:
-		is_game_over = true
+	if not game_over and players_alive.size() == 1:
+		game_over = true
 		var player_keys = players_alive.keys()
-		emit_signal("game_over", player_keys[0])
+		emit_signal("s_game_over", player_keys[0])

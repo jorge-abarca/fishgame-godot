@@ -1,18 +1,15 @@
 extends Node
 
-@export var cross_fade_duration: float = 2.0
+@export var cross_fade_duration : float = 2.0
 
 signal song_finished (song)
 
-@onready var tween : Tween
+@onready var tween = Tween.new()
 
 var current_song
 var initial_volume_dbs := {}
 
 func _ready() -> void:
-	tween = create_tween().set_ease(Tween.EASE_IN_OUT).set_trans(Tween.TRANS_LINEAR)
-	tween.connect("finished", _on_Tween_tween_completed)
-	
 	for child in get_children():
 		if child is AudioStreamPlayer:
 			initial_volume_dbs[child.name] = child.volume_db
@@ -24,12 +21,10 @@ func play(song_name: String) -> void:
 		return
 	
 	if current_song:
-		# tween.tween_property(current_song, "volume_db", current_song.volume_db, -40.0, (cross_fade_duration / 2.0))
-		tween.tween_property(current_song, "volume_db", -40.0, (cross_fade_duration / 2.0))
+		tween.tween_property(current_song, "volume_db", current_song.volume_db, -40.0) # , (cross_fade_duration / 2.0), Tween.TRANS_LINEAR, Tween.EASE_IN_OUT)
 	
 	next_song.play()
-	# tween.tween_property(next_song, "volume_db", -40.0, initial_volume_dbs.get(next_song.name, 0.0), (cross_fade_duration / 2.0))
-	tween.tween_property(next_song, "volume_db", initial_volume_dbs.get(next_song.name, 0.0), (cross_fade_duration / 2.0))
+	tween.tween_property(next_song, "volume_db", -40.0, initial_volume_dbs.get(next_song.name, 0.0)) # , (cross_fade_duration / 2.0), Tween.TRANS_LINEAR, Tween.EASE_IN_OUT)
 	
 	current_song = next_song
 	tween.play()
