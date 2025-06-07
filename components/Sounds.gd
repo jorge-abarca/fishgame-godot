@@ -1,8 +1,8 @@
 extends Node
 
-func play(name: String):
-	var node = get_node(name)
-	assert(node != null) #,"No sound with name " + name)
+func play(song_name: String):
+	var node = get_node(song_name)
+	assert(node != null, "No sound with name " + name)
 	
 	if node is AudioStreamPlayer:
 		node.play()

@@ -92,7 +92,8 @@ func _set_nakama_socket(_nakama_socket: NakamaSocket) -> void:
 		nakama_multiplayer_bridge.disconnect("match_join_error", Callable(self, "_on_match_join_error"))
 		nakama_multiplayer_bridge.leave()
 		nakama_multiplayer_bridge = null
-		get_tree().network_peer = null
+		# get_tree().network_peer = null
+		multiplayer.multiplayer_peer = null
 
 	nakama_socket = _nakama_socket
 
@@ -101,13 +102,12 @@ func _set_nakama_socket(_nakama_socket: NakamaSocket) -> void:
 		nakama_multiplayer_bridge = NakamaMultiplayerBridge.new(nakama_socket)
 		nakama_multiplayer_bridge.connect("match_joined", Callable(self, "_on_match_joined"))
 		nakama_multiplayer_bridge.connect("match_join_error", Callable(self, "_on_match_join_error"))
-#		get_tree().network_peer = nakama_multiplayer_bridge.multiplayer_peer
-		get_tree().get_multiplayer().multiplayer_peer = nakama_multiplayer_bridge.multiplayer_peer
+		# get_tree().network_peer = nakama_multiplayer_bridge.multiplayer_peer
+		multiplayer.multiplayer_peer = nakama_multiplayer_bridge.multiplayer_peer
 
 func _ready() -> void:
-	var tree = get_tree()
-	tree.connect("peer_connected", Callable(self, "_on_network_peer_connected"))
-	tree.connect("peer_disconnected", Callable(self, "_on_network_peer_disconnected"))
+	multiplayer.peer_connected.connect(_on_network_peer_connected)
+	multiplayer.peer_disconnected.connect(_on_network_peer_disconnected)
 
 func create_match(_nakama_socket: NakamaSocket) -> void:
 	leave()
@@ -209,9 +209,9 @@ func _check_enough_players() -> void:
 		emit_signal("match_not_ready")
 
 func _on_match_joined() -> void:
-	var my_peer_id := OS.get_unique_id()
-	var presence: NakamaRTAPI.UserPresence = nakama_multiplayer_bridge.get_user_presence_for_peer(my_peer_id.to_int())
-	var player = Player.from_presence(presence, my_peer_id.to_int())
+	var my_peer_id := multiplayer.get_unique_id()
+	var presence: NakamaRTAPI.UserPresence = nakama_multiplayer_bridge.get_user_presence_for_peer(my_peer_id)
+	var player = Player.from_presence(presence, my_peer_id)
 	players[my_peer_id] = player
 	emit_signal("match_joined", nakama_multiplayer_bridge.match_id, match_mode)
 

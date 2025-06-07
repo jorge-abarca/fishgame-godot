@@ -13,7 +13,6 @@ var _reconnect: bool = false
 var _next_screen
 
 func _ready() -> void:
-#	var file = File.new()
 	if FileAccess.file_exists(CREDENTIALS_FILENAME):
 		var file : FileAccess = FileAccess.open(CREDENTIALS_FILENAME, FileAccess.READ)
 		var test_json_conv : JSON = JSON.new()
@@ -28,7 +27,6 @@ func _ready() -> void:
 		file.close()
 
 func _save_credentials() -> void:
-#	var file = File.new()
 	var file = FileAccess.open(CREDENTIALS_FILENAME, FileAccess.WRITE)
 	var credentials = {
 		email = email,

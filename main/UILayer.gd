@@ -26,8 +26,8 @@ func get_current_screen_name() -> String:
 		return current_screen.name
 	return ''
 
-func show_screen(name: String, info: Dictionary = {}) -> void:
-	var screen = screens.get_node(name)
+func show_screen(screen_name: String, info: Dictionary = {}) -> void:
+	var screen = screens.get_node(screen_name)
 	if not screen:
 		return
 	
@@ -38,7 +38,7 @@ func show_screen(name: String, info: Dictionary = {}) -> void:
 	current_screen = screen
 	
 	if _is_ready:
-		emit_signal("change_screen", name, screen)
+		emit_signal("change_screen", screen_name, screen)
 
 func hide_screen() -> void:
 	if current_screen and current_screen.has_method('_hide_screen'):

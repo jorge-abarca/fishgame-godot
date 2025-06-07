@@ -17,6 +17,11 @@ func _ready() -> void:
 	OnlineMatch.connect("disconnected", Callable(self, "_on_OnlineMatch_disconnected"))
 	OnlineMatch.connect("player_joined", Callable(self, "_on_OnlineMatch_player_joined"))
 	OnlineMatch.connect("player_left", Callable(self, "_on_OnlineMatch_player_left"))
+	
+	# Handle game signals:
+	game.connect("s_game_started", _on_Game_game_started)
+	game.connect("player_dead", _on_Game_player_dead)
+	game.connect("s_game_over", _on_Game_game_over)
 
 	randomize()
 	music.play_random()
@@ -43,13 +48,13 @@ func _on_TitleScreen_play_online() -> void:
 
 	ui_layer.show_screen("ConnectionScreen")
 
-func _on_UILayer_change_screen(name: String, _screen) -> void:
-	if name == 'TitleScreen':
+func _on_UILayer_change_screen(screen_name: String, _screen) -> void:
+	if screen_name == 'TitleScreen':
 		ui_layer.hide_back_button()
 	else:
 		ui_layer.show_back_button()
 
-	if name != 'ReadyScreen':
+	if screen_name != 'ReadyScreen':
 		if match_started:
 			match_started = false
 			music.play_random()
@@ -70,7 +75,7 @@ func _on_UILayer_back_button() -> void:
 		ui_layer.show_screen("MatchScreen")
 
 func _on_ReadyScreen_ready_pressed() -> void:
-	rpc("player_ready", get_tree().get_unique_id())
+	rpc("player_ready", multiplayer.get_unique_id())
 
 #####
 # OnlineMatch callbacks
@@ -98,10 +103,12 @@ func _on_OnlineMatch_player_left(player) -> void:
 		ui_layer.show_message(player.username + " has left")
 
 func _on_OnlineMatch_player_joined(player) -> void:
-	if get_tree().is_server():
+	# if get_tree().is_server():
+	if is_multiplayer_authority():
 		# Tell this new player about all the other players that are already ready.
 		for p in players_ready.values():
-			rpc_id(p.peer_id, "player_ready", p.peer_id)
+			# rpc_id(p.peer_id, "player_ready", p.peer_id) # Original
+			rpc_id(player.peer_id, "player_ready", p.peer_id)
 
 #####
 # Gameplay methods and callbacks
@@ -111,7 +118,8 @@ func _on_OnlineMatch_player_joined(player) -> void:
 func player_ready(peer_id: int) -> void:
 	ready_screen.set_status(peer_id, "READY!")
 
-	if get_tree().is_server() and not players_ready.has(peer_id):
+	# if get_tree().is_server() and not players_ready.has(peer_id):
+	if is_multiplayer_authority() and not players_ready.has(peer_id):
 		players_ready[peer_id] = true
 		if players_ready.size() == OnlineMatch.players.size():
 			if OnlineMatch.match_state != OnlineMatch.MatchState.PLAYING:
@@ -153,7 +161,7 @@ func _on_Game_game_started() -> void:
 
 func _on_Game_player_dead(peer_id: int) -> void:
 	if GameState.online_play:
-		var my_id = get_tree().get_unique_id()
+		var my_id = multiplayer.get_unique_id()
 		if peer_id == my_id:
 			ui_layer.show_message("You lose!")
 
@@ -162,7 +170,8 @@ func _on_Game_game_over(peer_id: int) -> void:
 
 	if not GameState.online_play:
 		show_winner(players[peer_id])
-	elif get_tree().is_server():
+	# elif get_tree().is_server():
+	elif is_multiplayer_authority():
 		if not players_score.has(peer_id):
 			players_score[peer_id] = 1
 		else:
@@ -180,11 +189,11 @@ func update_wins_leaderboard() -> void:
 	Online.nakama_client.write_leaderboard_record_async(Online.nakama_session, 'fish_game_wins', 1)
 
 @rpc("any_peer", "call_local") 
-func show_winner(name: String, peer_id: int = 0, score: int = 0, is_match: bool = false) -> void:
+func show_winner(player_name: String, peer_id: int = 0, score: int = 0, is_match: bool = false) -> void:
 	if is_match:
-		ui_layer.show_message(name + " WINS THE WHOLE MATCH!")
+		ui_layer.show_message(player_name + " WINS THE WHOLE MATCH!")
 	else:
-		ui_layer.show_message(name + " wins this round!")
+		ui_layer.show_message(player_name + " wins this round!")
 
 	await get_tree().create_timer(2.0).timeout
 	if not game.game_started:
@@ -193,7 +202,7 @@ func show_winner(name: String, peer_id: int = 0, score: int = 0, is_match: bool 
 	if GameState.online_play:
 		if is_match:
 			stop_game()
-			if peer_id != 0 and peer_id == get_tree().get_unique_id():
+			if peer_id != 0 and peer_id == multiplayer.get_unique_id():
 				update_wins_leaderboard()
 			ui_layer.show_screen("MatchScreen")
 		else:
@@ -204,6 +213,6 @@ func show_winner(name: String, peer_id: int = 0, score: int = 0, is_match: bool 
 	else:
 		restart_game()
 
-func _on_Music_song_finished(song) -> void:
+func _on_Music_song_finished(_song) -> void:
 	if not music.current_song.playing:
 		music.play_random()

@@ -85,7 +85,7 @@ func _ready():
 
 func set_player_skin(_player_skin: int) -> void:
 	if player_skin != _player_skin and _player_skin < PlayerSkin.MAX and _player_skin >= 0:
-		player_skin = _player_skin
+		player_skin = _player_skin as PlayerSkin
 
 		if body_sprite != null:
 			body_sprite.texture = skin_resources[player_skin]
@@ -109,7 +109,7 @@ func set_pass_through_one_way_platforms(_pass_through: bool) -> void:
 		pass_through_one_way_platforms = _pass_through
 		set_collision_mask_value(ONE_WAY_PLATFORMS_COLLISION_BIT, !_pass_through)
 
-func _on_PassThroughDetectorArea_body_exited(body: Node) -> void:
+func _on_PassThroughDetectorArea_body_exited(_body: Node) -> void:
 	self.pass_through_one_way_platforms = false
 
 func set_show_gliding(_show_gliding: bool) -> void:
@@ -130,8 +130,8 @@ func set_show_sliding(_show_sliding: bool) -> void:
 		else:
 			pickup_animation_player.play("Idle")
 
-func play_animation(name) -> void:
-	sprite_animation_player.play(name)
+func play_animation(animation_name) -> void:
+	sprite_animation_player.play(animation_name)
 
 func get_current_animation() -> String:
 	return sprite_animation_player.current_animation
@@ -280,7 +280,7 @@ func _physics_process(delta: float) -> void:
 		else:
 			input_buffer.predict_next_frame()
 
-@rpc("any_peer") func update_remote_player(_input_buffer: Dictionary, current_state: String, state_info: Dictionary, _position: Vector2, _vector: Vector2, frame: int, _flip_h: bool, _show_gliding: bool, _show_sliding: bool, _pass_through: bool) -> void:
+@rpc("any_peer") func update_remote_player(_input_buffer: Dictionary, current_state: String, state_info: Dictionary, _position: Vector2, _vector: Vector2, _frame: int, _flip_h: bool, _show_gliding: bool, _show_sliding: bool, _pass_through: bool) -> void:
 	# Initialize the input buffer.
 	if input_buffer == null:
 		input_buffer = InputBuffer.new(PlayerActions, input_prefix)
@@ -294,6 +294,6 @@ func _physics_process(delta: float) -> void:
 	set_show_sliding(_show_sliding)
 	set_pass_through_one_way_platforms(_pass_through)
 
-func _on_StateMachine_state_changed(state, info: Dictionary) -> void:
+func _on_StateMachine_state_changed(_state, info: Dictionary) -> void:
 	sync_forced = true
 	sync_state_info = info

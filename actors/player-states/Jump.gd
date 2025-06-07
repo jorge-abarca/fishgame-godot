@@ -1,3 +1,4 @@
+@tool
 extends "res://actors/player-states/Move.gd"
 
 func _state_enter(info: Dictionary) -> void:
@@ -8,7 +9,7 @@ func _state_enter(info: Dictionary) -> void:
 	if info.has('input_vector'):
 		do_move(info['input_vector'])
 
-func _state_physics_process(delta: float) -> void:
+func _state_physics_process(_delta: float) -> void:
 	_check_pickup_or_throw_or_use()
 	
 	if host.is_on_floor():

@@ -6,3 +6,4 @@
 /webrtc/
 /nakama/data/
 /.godot/
+.godot/editor/

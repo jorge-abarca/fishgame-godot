@@ -1,3 +1,4 @@
+@tool
 extends "res://addons/snopek-state-machine/State.gd"
 
 @onready var host = $"../.."

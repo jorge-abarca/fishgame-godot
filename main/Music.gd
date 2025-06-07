@@ -4,8 +4,6 @@ extends Node
 
 signal song_finished (song)
 
-@onready var tween = Tween.new()
-
 var current_song
 var initial_volume_dbs := {}
 
@@ -20,11 +18,14 @@ func play(song_name: String) -> void:
 	if !next_song or next_song.playing:
 		return
 	
+	var tween = create_tween()
+	tween.set_ease(Tween.EASE_IN_OUT).set_trans(Tween.TRANS_LINEAR)
+	
 	if current_song:
-		tween.tween_property(current_song, "volume_db", current_song.volume_db, -40.0) # , (cross_fade_duration / 2.0), Tween.TRANS_LINEAR, Tween.EASE_IN_OUT)
+		tween.tween_property(current_song, "volume_db", -40.0, (cross_fade_duration / 2.0)) # , (cross_fade_duration / 2.0), Tween.TRANS_LINEAR, Tween.EASE_IN_OUT)
 	
 	next_song.play()
-	tween.tween_property(next_song, "volume_db", -40.0, initial_volume_dbs.get(next_song.name, 0.0)) # , (cross_fade_duration / 2.0), Tween.TRANS_LINEAR, Tween.EASE_IN_OUT)
+	tween.tween_property(next_song, "volume_db", initial_volume_dbs.get(next_song.name, 0.0), (cross_fade_duration / 2.0)) #, Tween.TRANS_LINEAR, Tween.EASE_IN_OUT)
 	
 	current_song = next_song
 	tween.play()
@@ -33,7 +34,8 @@ func play_random() -> void:
 	if get_child_count() == 1:
 		return
 	
-	var next_song: Node
+	var next_song: Node = null
+	
 	while next_song == null or current_song == next_song:
 		next_song = _pick_random()
 	
@@ -45,6 +47,6 @@ func _pick_random() -> Node:
 func _on_song_finished(song) -> void:
 	emit_signal("song_finished", song)
 
-func _on_Tween_tween_completed(object: Object, key: NodePath) -> void:
+func _on_Tween_tween_completed(object: Object, _key: NodePath) -> void:
 	if object != current_song:
 		object.stop()

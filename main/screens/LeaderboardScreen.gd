@@ -12,7 +12,7 @@ func clear_records() -> void:
 		record_container.remove_child(child)
 		child.queue_free()
 
-func _show_screen(info: Dictionary = {}) -> void:
+func _show_screen(_info: Dictionary = {}) -> void:
 	ui_layer.hide_message()
 	
 	# If our session has expired, show the ConnectionScreen again.

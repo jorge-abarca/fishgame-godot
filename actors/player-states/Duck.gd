@@ -1,6 +1,7 @@
+@tool
 extends "res://actors/player-states/Move.gd"
 
-func _state_enter(info: Dictionary) -> void:
+func _state_enter(_info: Dictionary) -> void:
 	host.play_animation("Duck")
 	host.ducking_collision_shape.set_deferred('disabled', false)
 	host.standing_collision_shape.set_deferred('disabled', true)

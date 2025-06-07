@@ -77,12 +77,12 @@ func _fire_projectile() -> void:
 
 func _on_throw_finished() -> void:
 	if ammo <= 0:
-		if not GameState.online_play:
-			_disintegrate()
-		else:
-			rpc("_disintegrate")
+		# This is called from _do_physics_finished, which is an RPC, allowing local disintegration logic:
+		_disintegrate()
 
-@rpc("any_peer", "call_local") func _disintegrate() -> void:
+# There is no need for _disintegrate to be an RPC since _do_physics_finished is an RPC.
+# Making this an RPC will result in obscure error messages during node_process!
+func _disintegrate() -> void:
 	var parent = get_parent();
 	if parent:
 		var effect = DisintegrateEffect.instantiate()

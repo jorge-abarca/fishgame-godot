@@ -60,8 +60,7 @@ func _do_game_setup(players: Dictionary) -> void:
 	camera.update_position_and_zoom(false)
 
 	if GameState.online_play:
-#		var my_id := get_tree().get_unique_id()
-		var my_id := OS.get_unique_id()
+		var my_id := multiplayer.get_unique_id()
 		var my_player := players_node.get_node(str(my_id))
 		my_player.player_controlled = true
 
@@ -85,6 +84,8 @@ func _do_game_start() -> void:
 		map.map_start()
 	emit_signal("s_game_started")
 	get_tree().set_pause(false)
+
+
 
 func game_stop() -> void:
 	if map.has_method('map_stop'):

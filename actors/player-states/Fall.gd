@@ -1,12 +1,13 @@
+@tool
 extends "res://actors/player-states/Move.gd"
 
-func _state_enter(info: Dictionary) -> void:
+func _state_enter(_info: Dictionary) -> void:
 	host.play_animation("Fall")
 
 func _state_exit() -> void:
 	host.show_gliding = false
 
-func _state_physics_process(delta: float) -> void:
+func _state_physics_process(_delta: float) -> void:
 	_check_pickup_or_throw_or_use()
 	
 	var input_vector = _get_player_input_vector()

@@ -48,7 +48,7 @@ func _physics_process(delta: float) -> void:
 	if start_position.distance_to(global_position) >= max_distance:
 		hit()
 
-func _on_Projectile_body_entered(body: Node) -> void:	
+func _on_Projectile_body_entered(_body: Node) -> void:	
 	if not dud:
 		hit()
 
