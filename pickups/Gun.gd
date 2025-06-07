@@ -64,6 +64,8 @@ func _fire_projectile() -> void:
 	if ammo <= 0:
 		var sparks = SparksEffect.instantiate()
 		sparks_position.add_child(sparks)
+		# Start effect in the right position:
+		sparks.start()
 		sounds.play("Empty")
 	else:
 		ammo -= 1
@@ -88,6 +90,8 @@ func _disintegrate() -> void:
 		var effect = DisintegrateEffect.instantiate()
 		parent.add_child(effect)
 		effect.global_position = global_position + Vector2(0, 10)
+		# Start effect in the right position:
+		effect.start()
 
 	queue_free()
 

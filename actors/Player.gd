@@ -238,9 +238,12 @@ func die() -> void:
 		_do_die();
 
 @rpc("any_peer", "call_local") func _do_die() -> void:
-	var explosion = ExplodeEffect.instantiate()
-	get_parent().add_child(explosion)
-	explosion.global_position = global_position
+	# Note: This is taken care in the Dead state. Either of them works fine.
+	# var explosion = ExplodeEffect.instantiate()
+	# get_parent().add_child(explosion)
+	# # Start effect in the right position:
+	# explosion.global_position = global_position
+	# explosion.start()
 
 	queue_free()
 	emit_signal("player_dead")

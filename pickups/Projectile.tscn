@@ -81,10 +81,10 @@ collision_mask = 2
 shape = SubResource("2")
 
 [node name="AnimationPlayer" type="AnimationPlayer" parent="."]
-autoplay = "Idle"
 libraries = {
-"": SubResource("AnimationLibrary_826px")
+&"": SubResource("AnimationLibrary_826px")
 }
+autoplay = "Idle"
 
 [connection signal="body_entered" from="." to="." method="_on_Projectile_body_entered"]
 [connection signal="animation_finished" from="AnimationPlayer" to="." method="_on_AnimationPlayer_animation_finished"]

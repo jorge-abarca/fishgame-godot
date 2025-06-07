@@ -133,10 +133,10 @@ shape = SubResource("2")
 one_shot = true
 
 [node name="AnimationPlayer" type="AnimationPlayer" parent="." index="7"]
-autoplay = "Idle"
 libraries = {
-"": SubResource("AnimationLibrary_v7nv2")
+&"": SubResource("AnimationLibrary_v7nv2")
 }
+autoplay = "Idle"
 
 [node name="Sounds" type="Node" parent="." index="8"]
 script = ExtResource("5")
