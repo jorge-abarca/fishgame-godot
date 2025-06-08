@@ -26,6 +26,8 @@ func _on_match_button_pressed(mode) -> void:
 
 	# Connect socket to realtime Nakama API if not connected.
 	if not Online.is_nakama_socket_connected():
+		# Reconnection is only possible when the socket is set to null:
+		Online.nakama_socket = null
 		Online.connect_nakama_socket()
 		await Online.socket_connected
 
