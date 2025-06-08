@@ -17,6 +17,7 @@ func _ready() -> void:
 	OnlineMatch.connect("disconnected", Callable(self, "_on_OnlineMatch_disconnected"))
 	OnlineMatch.connect("player_joined", Callable(self, "_on_OnlineMatch_player_joined"))
 	OnlineMatch.connect("player_left", Callable(self, "_on_OnlineMatch_player_left"))
+	OnlineMatch.connect("match_not_ready", Callable(self, "_on_OnlineMatch_match_not_ready"))
 	
 	# Handle game signals:
 	game.connect("s_game_started", _on_Game_game_started)
@@ -64,9 +65,6 @@ func _on_UILayer_back_button() -> void:
 
 	stop_game()
 
-	if GameState.online_play:
-		OnlineMatch.leave()
-
 	if ui_layer.current_screen_name in ['ConnectionScreen', 'MatchScreen', 'CreditsScreen']:
 		ui_layer.show_screen("TitleScreen")
 	elif not GameState.online_play:
@@ -103,12 +101,15 @@ func _on_OnlineMatch_player_left(player) -> void:
 		ui_layer.show_message(player.username + " has left")
 
 func _on_OnlineMatch_player_joined(player) -> void:
-	# if get_tree().is_server():
 	if is_multiplayer_authority():
 		# Tell this new player about all the other players that are already ready.
 		for p in players_ready.values():
 			# rpc_id(p.peer_id, "player_ready", p.peer_id) # Original
 			rpc_id(player.peer_id, "player_ready", p.peer_id)
+
+func _on_OnlineMatch_match_not_ready():
+	# Insufficient players, stop the game:
+	stop_game()
 
 #####
 # Gameplay methods and callbacks
@@ -118,7 +119,6 @@ func _on_OnlineMatch_player_joined(player) -> void:
 func player_ready(peer_id: int) -> void:
 	ready_screen.set_status(peer_id, "READY!")
 
-	# if get_tree().is_server() and not players_ready.has(peer_id):
 	if is_multiplayer_authority() and not players_ready.has(peer_id):
 		players_ready[peer_id] = true
 		if players_ready.size() == OnlineMatch.players.size():
@@ -170,7 +170,6 @@ func _on_Game_game_over(peer_id: int) -> void:
 
 	if not GameState.online_play:
 		show_winner(players[peer_id])
-	# elif get_tree().is_server():
 	elif is_multiplayer_authority():
 		if not players_score.has(peer_id):
 			players_score[peer_id] = 1
