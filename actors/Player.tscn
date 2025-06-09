@@ -22,6 +22,7 @@
 [ext_resource type="AudioStream" uid="uid://efkci8rjwvso" path="res://assets/sounds/blops/blop1.wav" id="20"]
 [ext_resource type="AudioStream" uid="uid://btn4i358p53i0" path="res://assets/sounds/blops/blop2.wav" id="21"]
 [ext_resource type="Script" uid="uid://k45oaaie66q1" path="res://actors/player-states/Fall.gd" id="22"]
+[ext_resource type="Script" uid="uid://pfdd6yd61daf" path="res://actors/player-states/Blop.gd" id="23"]
 
 [sub_resource type="RectangleShape2D" id="1"]
 size = Vector2(29, 56)
@@ -503,6 +504,9 @@ script = ExtResource("12")
 
 [node name="Idle" type="Node" parent="StateMachine"]
 script = ExtResource("16")
+
+[node name="Blop" type="Node" parent="StateMachine"]
+script = ExtResource("23")
 
 [node name="Move" type="Node" parent="StateMachine"]
 script = ExtResource("11")

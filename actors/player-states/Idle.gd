@@ -60,7 +60,9 @@ func _state_physics_process(delta: float) -> void:
 	_decelerate_to_zero(delta)
 	
 	if host.input_buffer.is_action_just_pressed("blop"):
-		host.play_animation("Blop")
+		# host.play_animation("Blop")
+		# A new state is necessary to Blop on-line:
+		get_parent().change_state("Blop")
 	
 	# If we just decelerated to 0, then switch to the idle animation.
 	if not host.get_current_animation() in ["Idle", "Blop", "Land"] and host.vector.x == 0:
