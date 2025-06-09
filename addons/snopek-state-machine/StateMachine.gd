@@ -1,7 +1,7 @@
 @tool
 extends Node
 
-@export var allowed_transitions : String = '' : set = set_allowed_transitions
+@export_multiline var allowed_transitions : String = '' : set = set_allowed_transitions
 
 var current_state
 var allowed_transitions_parsed := {}
