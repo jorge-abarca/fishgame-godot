@@ -54,8 +54,6 @@ offset_bottom = 0.0
 [node name="ReadyScreen" parent="UILayer/Screens" instance=ExtResource("6")]
 visible = false
 layout_mode = 1
-grow_horizontal = 2
-grow_vertical = 2
 
 [node name="LeaderboardScreen" parent="UILayer/Screens" instance=ExtResource("14")]
 visible = false
@@ -90,6 +88,7 @@ offset_bottom = 62.0
 grow_horizontal = 2
 theme_override_fonts/font = ExtResource("8")
 text = "Waiting for players..."
+horizontal_alignment = 1
 
 [node name="BackButton" type="Button" parent="UILayer/Overlay"]
 visible = false
