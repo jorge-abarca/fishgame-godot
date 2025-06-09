@@ -60,9 +60,8 @@ func _state_physics_process(delta: float) -> void:
 	_decelerate_to_zero(delta)
 	
 	if host.input_buffer.is_action_just_pressed("blop"):
-		# host.play_animation("Blop")
-		# A new state is necessary to Blop on-line:
-		get_parent().change_state("Blop")
+		# Move as its own procedure to allow remote blopping:
+		blop()
 	
 	# If we just decelerated to 0, then switch to the idle animation.
 	if not host.get_current_animation() in ["Idle", "Blop", "Land"] and host.vector.x == 0:
@@ -71,3 +70,15 @@ func _state_physics_process(delta: float) -> void:
 func _on_SpriteAnimationPlayer_animation_finished(anim_name: String) -> void:
 	if host.state_machine.current_state == self and anim_name == "Land":
 		host.play_animation("Idle")
+
+# This is modeled after the die and _do_die functions:
+func blop() -> void:
+	if GameState.online_play:
+		# Blop on-line:
+		if is_multiplayer_authority():
+			rpc("_do_blop")
+	else:
+		_do_blop();
+
+@rpc("any_peer", "call_local") func _do_blop() -> void:
+	host.play_animation("Blop")
