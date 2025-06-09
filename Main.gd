@@ -17,7 +17,6 @@ func _ready() -> void:
 	OnlineMatch.connect("disconnected", Callable(self, "_on_OnlineMatch_disconnected"))
 	OnlineMatch.connect("player_joined", Callable(self, "_on_OnlineMatch_player_joined"))
 	OnlineMatch.connect("player_left", Callable(self, "_on_OnlineMatch_player_left"))
-	OnlineMatch.connect("match_not_ready", Callable(self, "_on_OnlineMatch_match_not_ready"))
 	
 	# Handle game signals:
 	game.connect("s_game_started", _on_Game_game_started)
@@ -82,7 +81,14 @@ func _on_ReadyScreen_ready_pressed() -> void:
 func _on_OnlineMatch_error(message: String):
 	if message != '':
 		ui_layer.show_message(message)
+
+	# Don't stop the game if the player is playing locally or on a different screen,
+	# but stop it if they are playing or in the Match Screen:
+	if match_started == false or (GameState.online_play == false and ui_layer.current_screen_name != 'MatchScreen'):
+		return
+	
 	ui_layer.show_screen("MatchScreen")
+	stop_game()
 
 func _on_OnlineMatch_disconnected():
 	#_on_OnlineMatch_error("Disconnected from host")
@@ -106,10 +112,6 @@ func _on_OnlineMatch_player_joined(player) -> void:
 		for p in players_ready.values():
 			# rpc_id(p.peer_id, "player_ready", p.peer_id) # Original
 			rpc_id(player.peer_id, "player_ready", p.peer_id)
-
-func _on_OnlineMatch_match_not_ready():
-	# Insufficient players, stop the game:
-	stop_game()
 
 #####
 # Gameplay methods and callbacks
