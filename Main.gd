@@ -184,8 +184,8 @@ func update_wins_leaderboard() -> void:
 	if not Online.nakama_session or Online.nakama_session.is_expired():
 		# If our session has expired, then wait until a new session is setup.
 		await Online.session_connected
-
-	Online.nakama_client.write_leaderboard_record_async(Online.nakama_session, 'fish_game_wins', 1)
+	
+	await Online.nakama_client.write_leaderboard_record_async(Online.nakama_session, 'fish_game_wins', 1)
 
 @rpc("any_peer", "call_local") 
 func show_winner(player_name: String, peer_id: int = 0, score: int = 0, is_match: bool = false) -> void:
@@ -200,8 +200,10 @@ func show_winner(player_name: String, peer_id: int = 0, score: int = 0, is_match
 
 	if GameState.online_play:
 		if is_match:
+			# We retrieve the unique id before the game ends and disconnects:
+			var my_id := multiplayer.get_unique_id()
 			stop_game()
-			if peer_id != 0 and peer_id == multiplayer.get_unique_id():
+			if peer_id != 0 and peer_id == my_id:
 				update_wins_leaderboard()
 			ui_layer.show_screen("MatchScreen")
 		else:
