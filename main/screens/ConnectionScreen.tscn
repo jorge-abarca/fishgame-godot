@@ -75,6 +75,7 @@ size_flags_horizontal = 3
 theme_override_fonts/font = ExtResource("3")
 caret_blink = true
 secret = true
+secret_character = "*"
 
 [node name="Empty" type="Control" parent="TabContainer/Login/GridContainer"]
 layout_mode = 2
